@@ -27,6 +27,8 @@ echo:
 	mov bh, 0		; set page number to zero
 	int 0x10		; call bios interrupt for video mode
 
+	; someone please fix these weird characters with colored text
+
 	mov ah, 0x9		; change color of character
 	mov bh, 0		; page number
 	mov cx, 1		; amount of time to repeat the character
