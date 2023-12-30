@@ -1,9 +1,10 @@
 ; OS starts at 0x7C00
 org 0x7C00
-bits 16
+bits 16				; Assembler should use 16 bits
 
-%define NEXL 0x0D, 0x0A
+%define NEXL 0x0D, 0x0A		; Define NEXL as next line for strings
 
+; instantly jump to main because we made 'out' before the main
 start:
 	jmp main
 
@@ -22,11 +23,12 @@ out:
 
 	mov ah, 0x0e		; call bios interrupt
 	mov bh, 0		; set page number to zero
-	int 0x10
+	int 0x10		; call bios interrupt for video
 
 	jmp .loop		; else loop
 
 .done:
+	; remove the registers which we modified
 	pop ax
 	pop si
 	ret
@@ -39,9 +41,11 @@ main:
 
 	; setup stack
 	mov ss, ax
-	mov sp, 0x7C00
+	mov sp, 0x7C00		; stack position should be before the operating
+				; system or otherwise it will override the entire
+				; system
 
-	;print Hello World
+	;load the starter message
 	mov si, msg_1		; si register is where the string should be stored
 	call out
 	mov si, msg_2
@@ -61,7 +65,7 @@ main:
 	
 	hlt
 .hlt
-	jmp .hlt
+	jmp .hlt		; make our cpu halt loop if no task is given
 
 msg_1: db ' __________________________', NEXL, 0
 msg_2: db '/                          \', NEXL, 0
@@ -72,5 +76,6 @@ msg_6: db '| Have fun using it.       |', NEXL, 0
 msg_7: db '| _________________________/', NEXL, 0
 msg_8: db '|/', NEXL, 0
 
+; fill the end of the disk with AA 55 for the bios signature
 times 510-($-$$) db 0
 dw 0AA55h
