@@ -29,10 +29,10 @@ echo:
 
 	; someone please fix these weird characters with colored text
 
-	mov ah, 0x9		; change color of character
-	mov bh, 1			; set page
-	mov cx, 1		; amount of time to repeat the character
-	int 0x10		; call bios interrupt for video mode
+	; mov ah, 0x9		; change color of character
+	; mov bh, 1			; set page
+	; mov cx, 1		; amount of time to repeat the character
+	; int 0x10		; call bios interrupt for video mode
 
 	jmp .loop		; else loop
 
@@ -44,9 +44,29 @@ echo:
 	ret
 
 read:
-	mov ah, 0x00
-	int 0x16
+	mov ah, 0x0		; instruction for reading input, return, al=ascii val
+	int 0x16		; call bios interrupt
 
+	; mov al, ah		; show ascii letter of keycode value
+
+	mov ah, 0x0e		; display the value
+	mov bh, 0
+	int 0x10
+
+	;check if equal to backspace
+	cmp al, 8
+	je .backspace		; i backspace, jump to backspace label
+
+
+	jmp read		; if all check fails, we read again
+
+.backspace:
+	mov al, 20h
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	mov al, 8
 	mov ah, 0x0e
 	mov bh, 0
 	int 0x10
@@ -67,35 +87,36 @@ main:
 
 	;load the starter message
 	mov si, msg_1		; si register is where the string should be stored
-	mov bl, 000Ch		; color
+	; mov bl, 000Ch		; color
 	call echo
 	mov si, msg_2
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_3
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_4
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_5
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_6
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_7
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_8
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	mov si, msg_9
-	mov bl, 000Ch
+	; mov bl, 000Ch
 	call echo
 	
 	mov si, wd
 	call echo
+	mov ex, 0		; used for backspace limiting
 	call read
 
 	hlt
@@ -112,7 +133,7 @@ msg_7: db ' | _________________________/ ', NEXL, 0
 msg_8: db ' |/                           ', NEXL, 0
 msg_9: db '			         ', NEXL, 0
 
-wd: db 'LBL-$ ', 0
+wd: db 'LBL-# ', 0
 
 ; fill the end of the disk with AA 55 for the bios signature
 times 510-($-$$) db 0
