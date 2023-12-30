@@ -14,7 +14,6 @@ start:
 ;	ds:si, point to string, until 0 char is hit
 echo:
 	; put registers which we want to modify
-	push bx
 	push si
 	push ax
 
@@ -40,28 +39,37 @@ echo:
 	; remove the registers which we modified
 	pop ax
 	pop si
-	pop bx
 	ret
 
 read:
+	push bx
+	push ax
+
 	mov ah, 0x0		; instruction for reading input, return, al=ascii val
 	int 0x16		; call bios interrupt
 
-	; mov al, ah		; show ascii letter of keycode value
+	; check if equal to backspace
+	cmp al, 8
+	je .backspace		; if backspace, jump to backspace label
 
-	mov ah, 0x0e		; display the value
+	inc bx
+	
+	mov ah, 0x0e		; display ascii value
 	mov bh, 0
 	int 0x10
-
-	;check if equal to backspace
-	cmp al, 8
-	je .backspace		; i backspace, jump to backspace label
-
 
 	jmp read		; if all check fails, we read again
 
 .backspace:
-	mov al, 20h
+	cmp bx, 0
+	je read
+
+	mov al, 8
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	mov al, 20h		; print space and return
 	mov ah, 0x0e
 	mov bh, 0
 	int 0x10
@@ -71,6 +79,7 @@ read:
 	mov bh, 0
 	int 0x10
 
+	dec bx
 	jmp read
 
 main:
@@ -116,7 +125,7 @@ main:
 	
 	mov si, wd
 	call echo
-	mov ex, 0		; used for backspace limiting
+	mov bx, 0		; used for backspace limiting
 	call read
 
 	hlt
