@@ -30,9 +30,9 @@ echo:
 	; someone please fix these weird characters with colored text
 
 	mov ah, 0x9		; change color of character
-	mov bh, 0		; page number
+	mov bh, 1			; set page
 	mov cx, 1		; amount of time to repeat the character
-	int 0x10		; call bio interrupt for video mode
+	int 0x10		; call bios interrupt for video mode
 
 	jmp .loop		; else loop
 
@@ -42,6 +42,16 @@ echo:
 	pop si
 	pop bx
 	ret
+
+read:
+	mov ah, 0x00
+	int 0x16
+
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	jmp read
 
 main:
 	; setup data segments
@@ -80,13 +90,17 @@ main:
 	mov si, msg_8
 	mov bl, 000Ch
 	call echo
+	mov si, msg_9
+	mov bl, 000Ch
+	call echo
 	
-	mov ah, 0x00
-    	int 16h
+	mov si, wd
+	call echo
+	call read
 
 	hlt
-.hlt
-	jmp .hlt		; make our cpu halt loop if no task is given
+; .hlt:
+; 	jmp .hlt		; make our cpu halt loop if no task is given
 
 msg_1: db '  __________________________  ', NEXL, 0
 msg_2: db ' /                          \ ', NEXL, 0
@@ -95,7 +109,10 @@ msg_4: db ' | An open source operating | ', NEXL, 0
 msg_5: db ' | system made by xk-rl,    | ', NEXL, 0
 msg_6: db ' | Have fun using it.       | ', NEXL, 0
 msg_7: db ' | _________________________/ ', NEXL, 0
-msg_8: db ' |/ 				 ', NEXL, 0
+msg_8: db ' |/                           ', NEXL, 0
+msg_9: db '			         ', NEXL, 0
+
+wd: db 'LBL-$ ', 0
 
 ; fill the end of the disk with AA 55 for the bios signature
 times 510-($-$$) db 0
