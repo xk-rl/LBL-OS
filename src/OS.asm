@@ -58,6 +58,8 @@ read:
 	mov bh, 0
 	int 0x10
 
+	; combine all letters together inside a stack or variable and when enter key is pressed we check if the string is a command
+
 	jmp read		; if all check fails, we read again
 
 .backspace:
