@@ -4,14 +4,15 @@ bits 16				; assembler should use 16 bits
 
 %define NEXL 0x0D, 0x0A		; define NEXL as next line for strings
 
-; instantly jump to main because out is made before main
+; instantly jump to main, to avoid any loaded instructions which are made before the
+; main label itself
 start:
 	jmp main
 
 ; print
 ; param:
 ;	ds:si, point to string, until 0 char is hit
-out:
+echo:
 	; put registers which we want to modify
 	push si
 	push ax
@@ -24,6 +25,7 @@ out:
 	mov ah, 0x0e		; call bios interrupt
 	mov bh, 0		; set page number to zero
 	int 0x10		; call bios interrupt for video
+				; will write the ascii value inside the si register
 
 	jmp .loop		; else loop
 
@@ -47,21 +49,21 @@ main:
 
 	;load the starter message
 	mov si, msg_1		; si register is where the string should be stored
-	call out
+	call echo
 	mov si, msg_2
-	call out
+	call echo
 	mov si, msg_3
-	call out
+	call echo
 	mov si, msg_4
-	call out
+	call echo
 	mov si, msg_5
-	call out
+	call echo
 	mov si, msg_6
-	call out
+	call echo
 	mov si, msg_7
-	call out
+	call echo
 	mov si, msg_8
-	call out
+	call echo
 	
 	hlt
 .hlt
