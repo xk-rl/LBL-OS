@@ -1,10 +1,10 @@
 ; OS starts at 0x7C00
 org 0x7C00
-bits 16				; Assembler should use 16 bits
+bits 16				; assembler should use 16 bits
 
-%define NEXL 0x0D, 0x0A		; Define NEXL as next line for strings
+%define NEXL 0x0D, 0x0A		; define NEXL as next line for strings
 
-; instantly jump to main because we made 'out' before the main
+; instantly jump to main because out is made before main
 start:
 	jmp main
 
