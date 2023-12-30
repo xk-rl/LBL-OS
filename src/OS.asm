@@ -44,12 +44,20 @@ main:
 	;print Hello World
 	mov si, msg_hello	; si register is where the string should be stored
 	call out
+
+	mov si, msg_discord
+	call out
+
+	mov si, msg_github
+	call out
 	
 	hlt
 .hlt
 	jmp .hlt
 
 msg_hello: db 'Hello World!', NEXL, 0
+msg_discord: db 'bomba.cat on discord', NEXL, 0
+msg_github: db 'xk-rl on github', NEXL, 0
 
 times 510-($-$$) db 0
 dw 0AA55h
