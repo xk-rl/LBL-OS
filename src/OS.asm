@@ -16,7 +16,7 @@ out:
 	push ax
 
 .loop:
-	loadsb			; load next character in al
+	lodsb			; load next character in al
 	or al, al		; check if next character is null
 	jz .done		; jump if zero flag is met
 
@@ -49,7 +49,7 @@ main:
 .hlt
 	jmp .hlt
 
-msg_hello: "Hello World!", NEXL, 0
+msg_hello: db 'Hello World!', NEXL, 0
 
 times 510-($-$$) db 0
 dw 0AA55h
