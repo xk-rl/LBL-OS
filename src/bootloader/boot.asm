@@ -4,6 +4,40 @@ bits 16				; assembler should use 16 bits
 
 %define NEXL 0x0D, 0x0A		; define NEXL as next line for strings
 
+;
+; FAT12 HEADER
+;
+jmp short start
+nop
+
+bdb_oem:			db 'MSWIN4.1'	; 8 bytes
+bdb_bytes_per_sector:		dw 512
+bdb_sectors_per_cluster:	db 1
+bdb_reserved_sectors:		dw 1
+bdb_fat_count:			db 2
+bdb_dir_entry_count:		dw 0E0h
+bdb_total_sectors:		dw 2880		; 2880 * 512 = 1.44Mb
+bdb_media_descriptor_type:	db 0F0h		; F0 = 3.5" Floppy disk
+bdb_sectors_per_fat:		dw 9		; 9 Sectors Fat
+bdb_sectors_per_track:		dw 18
+bdb_head:			dw 2
+bdb_hidden_sectors:		dd 0
+bdb_large_sector_count:		dd 0
+
+;
+; Extended Boot Record
+;
+ebr_drive_number:		db 0		; 0x00 = floppy, 0x80 = hdd, useless actually
+				db 0		; reserved
+ebr_signature:			db 29h
+ebr_volume_id:			db 12h, 34h, 56h 78h ; Volume ID, not needed, can be anything
+ebr_volume_label:		db 'LBL OS FLOD' ; 11 bytes, padded with spaces!!!
+ebr_system_id:			db 'FAT12   '	; 8 bytes, padded with spaces!!!
+
+;
+; Code
+;
+
 ; instantly jump to main, to avoid any loaded instructions which are made before the
 ; main label itself
 start:
@@ -26,13 +60,6 @@ echo:
 	mov bh, 0		; set page number to zero
 	int 0x10		; call bios interrupt for video mode
 
-	; someone please fix these weird characters with colored text
-
-	; mov ah, 0x9		; change color of character
-	; mov bh, 1		; set page
-	; mov cx, 1		; amount of time to repeat the character
-	; int 0x10		; call bios interrupt for video mode
-
 	jmp .loop		; else loop
 
 .done:
@@ -53,41 +80,10 @@ main:
 				; system or otherwise it will override the entire
 				; system
 
-	;load the starter message
-	mov si, msg_1		; si register is where the string should be stored
-	call echo
-	mov si, msg_2
-	call echo
-	mov si, msg_3
-	call echo
-	mov si, msg_4
-	call echo
-	mov si, msg_5
-	call echo
-	mov si, msg_6
-	call echo
-	mov si, msg_7
-	call echo
-	mov si, msg_8
-	call echo
-	mov si, msg_9
-	call echo
 
 	hlt
 ; .hlt:
 ; 	jmp .hlt		; make our cpu halt loop if no task is given
-
-msg_1: db '  __________________________  ', NEXL, 0
-msg_2: db ' /                          \ ', NEXL, 0
-msg_3: db ' | Welcome to LBL OS!       | ', NEXL, 0
-msg_4: db ' | An open source operating | ', NEXL, 0
-msg_5: db ' | system made by xk-rl,    | ', NEXL, 0
-msg_6: db ' | Bootloader is starting.. | ', NEXL, 0
-msg_7: db ' | _________________________/ ', NEXL, 0
-msg_8: db ' |/                           ', NEXL, 0
-msg_9: db '			         ', NEXL, 0
-
-; removed all input, this is boot only
 
 ; fill the end of the disk with AA 55 for the bios signature
 times 510-($-$$) db 0
