@@ -82,7 +82,7 @@ msg_2: db ' /                          \ ', NEXL, 0
 msg_3: db ' | Welcome to LBL OS!       | ', NEXL, 0
 msg_4: db ' | An open source operating | ', NEXL, 0
 msg_5: db ' | system made by xk-rl,    | ', NEXL, 0
-msg_6: db ' | Have fun using it.       | ', NEXL, 0
+msg_6: db ' | Bootloader is starting.. | ', NEXL, 0
 msg_7: db ' | _________________________/ ', NEXL, 0
 msg_8: db ' |/                           ', NEXL, 0
 msg_9: db '			         ', NEXL, 0
