@@ -68,6 +68,56 @@ echo:
 	pop si
 	ret
 
+read:
+	push bx
+	push ax
+
+	mov ah, 0x0
+	int 0x16
+
+	cmp al, 8
+	je .backspace
+
+	cmp al, 13
+	je .enter
+	
+	inc bx
+
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+	
+	jmp read
+
+.enter:
+	mov bx, 0
+	mov si, empty
+	call echo
+	mov si, wd
+	call echo
+
+.backspace:
+	cmp bx, 0
+	je read
+
+	dec bx
+	
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	mov al, 32
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	mov al, 8
+	mov ah, 0x0e
+	mov bh, 0
+	int 0x10
+
+	jmp read
+
 main:
 	; setup data segments
 	mov ax, 0
@@ -80,10 +130,23 @@ main:
 				; system or otherwise it will override the entire
 				; system
 
+	mov si, booting
+	call echo
+	mov si, wd
+	call echo
+	mov bx, 0
+	call read
+
 
 	hlt
-; .hlt:
-; 	jmp .hlt		; make our cpu halt loop if no task is given
+
+booting: db 'Booting...', NEXL, 0
+
+.hlt:
+ 	jmp .hlt		; make our cpu halt loop if no task is given
+
+wd: db 'LBL - # ', 0
+empty: db '', NEXL, 0
 
 ; fill the end of the disk with AA 55 for the bios signature
 times 510-($-$$) db 0
